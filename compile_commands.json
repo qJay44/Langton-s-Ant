@@ -1,0 +1,7 @@
+[
+{
+  "directory": "C:/Users/gerku/source/repos/Langton's Ant/Debug",
+  "command": "C:\\MinGW\\bin\\g++.exe  @CMakeFiles/MyProject.dir/includes_CXX.rsp -g -std=gnu++1z -o CMakeFiles\\MyProject.dir\\main.cpp.obj -c \"C:\\Users\\gerku\\source\\repos\\Langton's Ant\\main.cpp\"",
+  "file": "C:/Users/gerku/source/repos/Langton's Ant/main.cpp"
+}
+]
