@@ -1,3 +1,0 @@
-C:/Users/gerku/source/repos/Langton's Ant/Debug/CMakeFiles/MyProject.dir
-C:/Users/gerku/source/repos/Langton's Ant/Debug/CMakeFiles/edit_cache.dir
-C:/Users/gerku/source/repos/Langton's Ant/Debug/CMakeFiles/rebuild_cache.dir
