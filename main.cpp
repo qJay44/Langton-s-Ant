@@ -1,4 +1,7 @@
-#include <SFML/Graphics.hpp>
+#include "SFML/Graphics.hpp"
+#include "SFML/Window.hpp"
+#include "SFML/System.hpp"
+#include <stdlib.h>
 
 enum Direction {
   UP,
@@ -8,9 +11,12 @@ enum Direction {
 };
 
 class Ant {
-  public:
-    int x, y, windowWidth, windowHeight;
+  private:
+    int windowWidth, windowHeight;
     Direction dir = UP;
+
+  public:
+    int x, y;
 
     Ant(int x, int y, int windowWidth, int windowHeight) {
       this->x = x;
@@ -69,28 +75,32 @@ class Ant {
           break;
       }
 
-      if (x > windowWidth) x = 0;
+      if (x > windowWidth - 1) x = 0;
       if (x < 0) x = windowWidth - 1;
 
-      if (y > windowHeight) y = 0;
+      if (y > windowHeight - 1) y = 0;
       if (y < 0) y = windowHeight - 1;
     }
 };
 
-void draw(int[][10] , Ant);
-
 int main() {
 
-  const int width = 400;
-  const int height = 400;
-  int grid[width][height] = {};
+  const int width = 800;
+  const int height = 800;
+  const int squareSize = 8;
+  const int amount = width / squareSize;
+  const int stepsPerFrame = 5;
+  srand((unsigned)time(NULL));
 
-  Ant ant = Ant(200, 200, 400, 400);
+  int grid[amount][amount] = {};
+
+  Ant ant = Ant(amount / 2, amount / 2, amount, amount);
 
   grid[ant.x][ant.y] = 1;
 
   // create the window
   sf::RenderWindow window(sf::VideoMode(width, height), "My window");
+  window.setFramerateLimit(75);
 
   // run the program as long as the window is open
   while (window.isOpen())
@@ -108,19 +118,30 @@ int main() {
       window.clear(sf::Color::White);
 
       // draw everything here...
-      const int state = grid[ant.x][ant.y];
 
-      switch (state) {
-        case 0:
-          ant.turnRight();
-          grid[ant.x][ant.y] = 1;
-          ant.moveForward();
-          break;
-        case 1:
-          ant.turnLeft();
-          grid[ant.x][ant.y] = 0;
-          ant.moveForward();
-          break;
+      for (int step = 0; step < stepsPerFrame; step++) {
+        switch (grid[ant.x][ant.y]) {
+          case 0:
+            ant.turnRight();
+            grid[ant.x][ant.y] = 1;
+            break;
+          case 1:
+            ant.turnLeft();
+            grid[ant.x][ant.y] = 0;
+            break;
+        }
+        ant.moveForward();
+      }
+
+      for (int i = 0; i < amount; i++) {
+        for (int j = 0; j < amount; j++) {
+          sf::RectangleShape rect;
+          rect.setSize(sf::Vector2f(squareSize, squareSize));
+          rect.setPosition(i * squareSize, j * squareSize);
+          rect.setFillColor((grid[i][j] == 0) ? sf::Color(0) : sf::Color(255));
+
+          window.draw(rect);
+        }
       }
 
       // end the current frame
