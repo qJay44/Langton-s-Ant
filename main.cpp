@@ -1,13 +1,26 @@
 #include "SFML/Graphics.hpp"
 #include "SFML/Window.hpp"
 #include "SFML/System.hpp"
+#include <iostream>
 #include <stdlib.h>
+#include <vector>
 
 enum Direction {
   UP,
   RIGHT,
   DOWN,
   LEFT,
+};
+
+enum State {
+  WHITE,
+  BLACK,
+  RED,
+  GREEN,
+  CYAN,
+  YELLOW,
+  PURPLE,
+  BLUE,
 };
 
 class Ant {
@@ -83,70 +96,107 @@ class Ant {
     }
 };
 
+sf::Color getColor(State state) {
+  switch (state) {
+    case WHITE:  return sf::Color::White;
+    case RED:    return sf::Color::Red;
+    case GREEN:  return sf::Color::Green;
+    case CYAN:   return sf::Color::Cyan;
+    case YELLOW: return sf::Color::Yellow;
+    case PURPLE: return sf::Color::Magenta;
+    case BLACK:  return sf::Color::Black;
+    case BLUE:   return sf::Color::Blue;
+  }
+};
+
+
 int main() {
 
   const int width = 800;
   const int height = 800;
-  const int squareSize = 8;
+  const int squareSize = 5;
   const int amount = width / squareSize;
-  const int stepsPerFrame = 5;
+  const int stepsPerFrame = 200;
   srand((unsigned)time(NULL));
-
-  int grid[amount][amount] = {};
 
   Ant ant = Ant(amount / 2, amount / 2, amount, amount);
 
-  grid[ant.x][ant.y] = 1;
+  std::vector<std::vector<State>> grid(amount, std::vector<State>(amount, WHITE));
+  grid[ant.x][ant.y] = RED;
 
   // create the window
-  sf::RenderWindow window(sf::VideoMode(width, height), "My window");
+  sf::RenderWindow window(sf::VideoMode(width, height), "Langton's ant");
   window.setFramerateLimit(75);
 
   // run the program as long as the window is open
   while (window.isOpen())
   {
-      // check all the window's events that were triggered since the last iteration of the loop
-      sf::Event event;
-      while (window.pollEvent(event))
-      {
-          // "close requested" event: we close the window
-          if (event.type == sf::Event::Closed)
-              window.close();
+    // check all the window's events that were triggered since the last iteration of the loop
+    sf::Event event;
+    while (window.pollEvent(event))
+    {
+        // "close requested" event: we close the window
+        if (event.type == sf::Event::Closed)
+            window.close();
+    }
+
+    // clear the window with black color
+    window.clear(sf::Color::White);
+
+    // draw everything here...
+
+    for (int step = 0; step < stepsPerFrame; step++) {
+      switch (grid[ant.x][ant.y]) {
+        case WHITE:
+          ant.turnRight();
+          grid[ant.x][ant.y] = RED;
+          break;
+        case RED:
+          ant.turnRight();
+          grid[ant.x][ant.y] = GREEN;
+          break;
+        case GREEN:
+          ant.turnRight();
+          grid[ant.x][ant.y] = CYAN;
+          break;
+        case CYAN:
+          ant.turnLeft();
+          grid[ant.x][ant.y] = YELLOW;
+          break;
+        case YELLOW:
+          ant.turnRight();
+          grid[ant.x][ant.y] = PURPLE;
+          break;
+        case PURPLE:
+          ant.turnLeft();
+          grid[ant.x][ant.y] = BLACK;
+          break;
+        case BLACK:
+          ant.turnLeft();
+          grid[ant.x][ant.y] = BLUE;
+          break;
+        case BLUE:
+          ant.turnRight();
+          grid[ant.x][ant.y] = WHITE;
+          break;
       }
+      ant.moveForward();
+    }
 
-      // clear the window with black color
-      window.clear(sf::Color::White);
+    for (int i = 0; i < amount; i++) {
+      for (int j = 0; j < amount; j++) {
+        sf::RectangleShape rect;
+        rect.setSize(sf::Vector2f(squareSize, squareSize));
+        rect.setPosition(i * squareSize, j * squareSize);
+        rect.setFillColor(getColor(grid[i][j]));
 
-      // draw everything here...
-
-      for (int step = 0; step < stepsPerFrame; step++) {
-        switch (grid[ant.x][ant.y]) {
-          case 0:
-            ant.turnRight();
-            grid[ant.x][ant.y] = 1;
-            break;
-          case 1:
-            ant.turnLeft();
-            grid[ant.x][ant.y] = 0;
-            break;
-        }
-        ant.moveForward();
+        window.draw(rect);
       }
+    }
 
-      for (int i = 0; i < amount; i++) {
-        for (int j = 0; j < amount; j++) {
-          sf::RectangleShape rect;
-          rect.setSize(sf::Vector2f(squareSize, squareSize));
-          rect.setPosition(i * squareSize, j * squareSize);
-          rect.setFillColor((grid[i][j] == 0) ? sf::Color(0) : sf::Color(255));
-
-          window.draw(rect);
-        }
-      }
-
-      // end the current frame
-      window.display();
-  }
+    // end the current frame
+    window.display();
+}
 
   return 0;
 }
