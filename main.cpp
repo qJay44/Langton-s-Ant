@@ -3,6 +3,7 @@
 #include "SFML/System.hpp"
 #include <iostream>
 #include <stdlib.h>
+#include <string>
 #include <vector>
 
 enum Direction {
@@ -109,24 +110,46 @@ sf::Color getColor(State state) {
   }
 };
 
-
 int main() {
-
-  const int width = 800;
-  const int height = 800;
-  const int squareSize = 5;
-  const int amount = width / squareSize;
+  const int width = 1200;
+  const int height = 900;
+  const int squareSize = 4;
+  const int amountX = width / squareSize;
+  const int amountY = height / squareSize;
   const int stepsPerFrame = 200;
+
   srand((unsigned)time(NULL));
 
-  Ant ant = Ant(amount / 2, amount / 2, amount, amount);
+  Ant ant = Ant(amountX / 2, amountY / 2, amountX, amountY);
 
-  std::vector<std::vector<State>> grid(amount, std::vector<State>(amount, WHITE));
+  // grid
+  std::vector<std::vector<State>> grid(amountX, std::vector<State>(amountY, WHITE));
   grid[ant.x][ant.y] = RED;
 
   // create the window
   sf::RenderWindow window(sf::VideoMode(width, height), "Langton's ant");
   window.setFramerateLimit(75);
+
+  sf::RenderTexture renderTexture;
+  renderTexture.create(width, height);
+
+  sf::Font font;
+  font.loadFromFile("Minecraft rus.ttf");
+
+  sf::Text iterTitle;
+  iterTitle.setFont(font);
+  iterTitle.setString("Iter: ");
+  iterTitle.setCharacterSize(20);
+  iterTitle.setFillColor(sf::Color::White);
+  iterTitle.setPosition(sf::Vector2f(20.f, 20.f));
+
+  int antSteps = 0;
+  sf::Text antStepsText;
+  antStepsText.setFont(font);
+  antStepsText.setString(std::to_string(antSteps));
+  antStepsText.setCharacterSize(20);
+  antStepsText.setFillColor(sf::Color::White);
+  antStepsText.setPosition(sf::Vector2f(90.f, 20.f));
 
   // run the program as long as the window is open
   while (window.isOpen())
@@ -141,11 +164,27 @@ int main() {
     }
 
     // clear the window with black color
-    window.clear(sf::Color::White);
+    window.clear(sf::Color::Black);
 
     // draw everything here...
 
     for (int step = 0; step < stepsPerFrame; step++) {
+
+      // A rectangle with color to draw
+      sf::RectangleShape rect;
+      rect.setSize(sf::Vector2f(squareSize, squareSize));
+      rect.setPosition(ant.x * squareSize, ant.y * squareSize);
+      rect.setFillColor(getColor(grid[ant.x][ant.y]));
+
+      // Draw the rectangle on the render texture
+      renderTexture.draw(rect);
+      renderTexture.display();
+
+      // Get the render texture and draw it on the window
+      const sf::Texture &texture = renderTexture.getTexture();
+      sf::Sprite sprite(texture);
+      window.draw(sprite);
+
       switch (grid[ant.x][ant.y]) {
         case WHITE:
           ant.turnRight();
@@ -181,22 +220,16 @@ int main() {
           break;
       }
       ant.moveForward();
+      antSteps++;
     }
 
-    for (int i = 0; i < amount; i++) {
-      for (int j = 0; j < amount; j++) {
-        sf::RectangleShape rect;
-        rect.setSize(sf::Vector2f(squareSize, squareSize));
-        rect.setPosition(i * squareSize, j * squareSize);
-        rect.setFillColor(getColor(grid[i][j]));
-
-        window.draw(rect);
-      }
-    }
+    antStepsText.setString(std::to_string(antSteps));
+    window.draw(iterTitle);
+    window.draw(antStepsText);
 
     // end the current frame
     window.display();
-}
+  }
 
   return 0;
 }
