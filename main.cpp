@@ -2,7 +2,7 @@
 #include "SFML/Window.hpp"
 #include "SFML/System.hpp"
 #include <iostream>
-#include <stdlib.h>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -91,10 +91,10 @@ class Ant {
       }
 
       if (x > windowWidth - 1) x = 0;
-      if (x < 0) x = windowWidth - 1;
+      else if (x < 0) x = windowWidth - 1;
 
       if (y > windowHeight - 1) y = 0;
-      if (y < 0) y = windowHeight - 1;
+      else if (y < 0) y = windowHeight - 1;
     }
 };
 
@@ -109,6 +109,22 @@ sf::Color getColor(State state) {
     case BLACK:  return sf::Color::Black;
     case BLUE:   return sf::Color::Blue;
   }
+};
+
+// Custom locale separator
+struct separated : std::numpunct<char> {
+  char do_thousands_sep() const { return ' '; }
+  std::string do_grouping() const { return "\03"; }
+};
+
+// Separate thousands
+std::string formatWithDots(int value) {
+  static std::locale ourLocal(std::cout.getloc(), new separated);
+  std::stringstream ss;
+  ss.imbue(ourLocal);
+  ss << std::fixed << value;
+
+  return ss.str();
 };
 
 int main() {
@@ -172,7 +188,7 @@ int main() {
 
     // draw everything here...
 
-    for (int step = 0; step < stepsPerFrame; step++) {
+    for (size_t step = 0; step < stepsPerFrame; step++) {
 
       // A rectangle with color to draw
       sf::RectangleShape rect;
@@ -193,7 +209,7 @@ int main() {
           grid[ant.x][ant.y] = GREEN;
           break;
         case GREEN:
-          ant.turnRight();
+          ant.turnLeft();
           grid[ant.x][ant.y] = CYAN;
           break;
         case CYAN:
@@ -201,11 +217,11 @@ int main() {
           grid[ant.x][ant.y] = YELLOW;
           break;
         case YELLOW:
-          ant.turnRight();
+          ant.turnLeft();
           grid[ant.x][ant.y] = PURPLE;
           break;
         case PURPLE:
-          ant.turnLeft();
+          ant.turnRight();
           grid[ant.x][ant.y] = BLACK;
           break;
         case BLACK:
@@ -213,7 +229,7 @@ int main() {
           grid[ant.x][ant.y] = BLUE;
           break;
         case BLUE:
-          ant.turnRight();
+          ant.turnLeft();
           grid[ant.x][ant.y] = WHITE;
           break;
       }
@@ -221,7 +237,7 @@ int main() {
       ant.steps++;
     }
 
-    antStepsText.setString(std::to_string(ant.steps));
+    antStepsText.setString(formatWithDots(ant.steps));
     window.draw(iterTitle);
     window.draw(antStepsText);
     window.draw(canvasSprite);
