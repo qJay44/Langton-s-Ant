@@ -31,6 +31,7 @@ class Ant {
 
   public:
     int x, y;
+    int steps = 0;
 
     Ant(int x, int y, int windowWidth, int windowHeight) {
       this->x = x;
@@ -113,10 +114,10 @@ sf::Color getColor(State state) {
 int main() {
   const int width = 1200;
   const int height = 900;
-  const int squareSize = 4;
+  const int squareSize = 1;
   const int amountX = width / squareSize;
   const int amountY = height / squareSize;
-  const int stepsPerFrame = 200;
+  const int stepsPerFrame = 20000;
 
   srand((unsigned)time(NULL));
 
@@ -133,6 +134,10 @@ int main() {
   sf::RenderTexture renderTexture;
   renderTexture.create(width, height);
 
+  // Get the render texture and make sprite of it
+  const sf::Texture &canvasTexture = renderTexture.getTexture();
+  sf::Sprite canvasSprite(canvasTexture);
+
   sf::Font font;
   font.loadFromFile("Minecraft rus.ttf");
 
@@ -143,10 +148,9 @@ int main() {
   iterTitle.setFillColor(sf::Color::White);
   iterTitle.setPosition(sf::Vector2f(20.f, 20.f));
 
-  int antSteps = 0;
   sf::Text antStepsText;
   antStepsText.setFont(font);
-  antStepsText.setString(std::to_string(antSteps));
+  antStepsText.setString("0");
   antStepsText.setCharacterSize(20);
   antStepsText.setFillColor(sf::Color::White);
   antStepsText.setPosition(sf::Vector2f(90.f, 20.f));
@@ -178,12 +182,6 @@ int main() {
 
       // Draw the rectangle on the render texture
       renderTexture.draw(rect);
-      renderTexture.display();
-
-      // Get the render texture and draw it on the window
-      const sf::Texture &texture = renderTexture.getTexture();
-      sf::Sprite sprite(texture);
-      window.draw(sprite);
 
       switch (grid[ant.x][ant.y]) {
         case WHITE:
@@ -220,12 +218,13 @@ int main() {
           break;
       }
       ant.moveForward();
-      antSteps++;
+      ant.steps++;
     }
 
-    antStepsText.setString(std::to_string(antSteps));
+    antStepsText.setString(std::to_string(ant.steps));
     window.draw(iterTitle);
     window.draw(antStepsText);
+    window.draw(canvasSprite);
 
     // end the current frame
     window.display();
