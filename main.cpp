@@ -14,14 +14,22 @@ enum Direction {
 };
 
 enum State {
-  WHITE,
+  SOFT_BLACK,
   BLACK,
   RED,
   GREEN,
-  CYAN,
-  YELLOW,
-  PURPLE,
   BLUE,
+  YELLOW,
+  ORANGE,
+  PURPLE,
+  MAGENTA,
+  CYAN,
+  RUBBY_PINK,
+  BROWN,
+  LIME,
+  LIGHT_BLUE,
+  YUKON_GOLD,
+  DARK_BLUE
 };
 
 class Ant {
@@ -100,14 +108,22 @@ class Ant {
 
 sf::Color getColor(State state) {
   switch (state) {
-    case WHITE:  return sf::Color::White;
-    case RED:    return sf::Color::Red;
-    case GREEN:  return sf::Color::Green;
-    case CYAN:   return sf::Color::Cyan;
-    case YELLOW: return sf::Color::Yellow;
-    case PURPLE: return sf::Color::Magenta;
-    case BLACK:  return sf::Color::Black;
-    case BLUE:   return sf::Color::Blue;
+    case SOFT_BLACK: return sf::Color(31, 30, 31);
+    case BLACK:      return sf::Color::Black;
+    case RED:        return sf::Color::Red;
+    case GREEN:      return sf::Color::Green;
+    case BLUE:       return sf::Color::Blue;
+    case YELLOW:     return sf::Color::Yellow;
+    case ORANGE:     return sf::Color(255, 165, 0);
+    case PURPLE:     return sf::Color(138, 43, 226);
+    case MAGENTA:    return sf::Color::Magenta;
+    case CYAN:       return sf::Color::Cyan;
+    case RUBBY_PINK: return sf::Color(207, 142, 146);
+    case BROWN:      return sf::Color(165, 42, 42);
+    case LIME:       return sf::Color(50, 205, 50);
+    case LIGHT_BLUE: return sf::Color(173, 216, 230);
+    case YUKON_GOLD: return sf::Color(107, 106, 8);
+    case DARK_BLUE:  return sf::Color(0, 0, 139);
   }
 };
 
@@ -140,8 +156,7 @@ int main() {
   Ant ant = Ant(amountX / 2, amountY / 2, amountX, amountY);
 
   // grid
-  std::vector<std::vector<State>> grid(amountX, std::vector<State>(amountY, WHITE));
-  grid[ant.x][ant.y] = RED;
+  std::vector<std::vector<State>> grid(amountX, std::vector<State>(amountY, SOFT_BLACK));
 
   // create the window
   sf::RenderWindow window(sf::VideoMode(width, height), "Langton's ant");
@@ -184,53 +199,84 @@ int main() {
     }
 
     // clear the window with black color
-    window.clear(sf::Color::Black);
+    window.clear(getColor(SOFT_BLACK));
 
     // draw everything here...
-
     for (size_t step = 0; step < stepsPerFrame; step++) {
 
       // A rectangle with color to draw
       sf::RectangleShape rect;
       rect.setSize(sf::Vector2f(squareSize, squareSize));
-      rect.setPosition(ant.x * squareSize, ant.y * squareSize);
+      rect.setPosition(ant.x, ant.y);
       rect.setFillColor(getColor(grid[ant.x][ant.y]));
 
       // Draw the rectangle on the render texture
       renderTexture.draw(rect);
 
       switch (grid[ant.x][ant.y]) {
-        case WHITE:
-          ant.turnRight();
-          grid[ant.x][ant.y] = RED;
-          break;
-        case RED:
-          ant.turnRight();
-          grid[ant.x][ant.y] = GREEN;
-          break;
-        case GREEN:
-          ant.turnLeft();
-          grid[ant.x][ant.y] = CYAN;
-          break;
-        case CYAN:
-          ant.turnLeft();
-          grid[ant.x][ant.y] = YELLOW;
-          break;
-        case YELLOW:
-          ant.turnLeft();
-          grid[ant.x][ant.y] = PURPLE;
-          break;
-        case PURPLE:
+        case SOFT_BLACK:
           ant.turnRight();
           grid[ant.x][ant.y] = BLACK;
           break;
         case BLACK:
+          ant.turnRight();
+          grid[ant.x][ant.y] = RED;
+          break;
+        case RED:
+          ant.turnLeft();
+          grid[ant.x][ant.y] = GREEN;
+          break;
+        case GREEN:
           ant.turnLeft();
           grid[ant.x][ant.y] = BLUE;
           break;
         case BLUE:
           ant.turnLeft();
-          grid[ant.x][ant.y] = WHITE;
+          grid[ant.x][ant.y] = YELLOW;
+          break;
+        case YELLOW:
+          ant.turnRight();
+          grid[ant.x][ant.y] = ORANGE;
+          break;
+        case ORANGE:
+          ant.turnLeft();
+          grid[ant.x][ant.y] = PURPLE;
+          break;
+        case PURPLE:
+          ant.turnLeft();
+          grid[ant.x][ant.y] = MAGENTA;
+          break;
+        case MAGENTA:
+          ant.turnLeft();
+          grid[ant.x][ant.y] = DARK_BLUE;
+          break;
+        case DARK_BLUE:
+          ant.turnLeft();
+          grid[ant.x][ant.y] = YUKON_GOLD;
+          break;
+        case YUKON_GOLD:
+          ant.turnLeft();
+          grid[ant.x][ant.y] = LIGHT_BLUE;
+          break;
+        case LIGHT_BLUE:
+          ant.turnLeft();
+          grid[ant.x][ant.y] = LIME;
+          break;
+        case LIME:
+          ant.turnLeft();
+          grid[ant.x][ant.y] = BROWN;
+          break;
+        case BROWN:
+          ant.turnLeft();
+          grid[ant.x][ant.y] = RUBBY_PINK;
+          break;
+        case RUBBY_PINK:
+          ant.turnLeft();
+          grid[ant.x][ant.y] = CYAN;
+          break;
+        case CYAN:
+          ant.turnRight();
+          grid[ant.x][ant.y] = BLACK;
           break;
       }
       ant.moveForward();
