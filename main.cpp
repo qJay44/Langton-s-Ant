@@ -14,8 +14,8 @@ enum Direction {
 };
 
 enum State {
+  GRAY,
   SOFT_BLACK,
-  BLACK,
   RED,
   GREEN,
   BLUE,
@@ -29,7 +29,7 @@ enum State {
   LIME,
   LIGHT_BLUE,
   YUKON_GOLD,
-  DARK_BLUE
+  SCIENCE_BLUE
 };
 
 class Ant {
@@ -85,13 +85,13 @@ class Ant {
     void moveForward() {
       switch (dir) {
         case UP:
-          y--;
+          y++;
           break;
         case RIGHT:
           x++;
           break;
         case DOWN:
-          y++;
+          y--;
           break;
         case LEFT:
           x--;
@@ -108,22 +108,22 @@ class Ant {
 
 sf::Color getColor(State state) {
   switch (state) {
-    case SOFT_BLACK: return sf::Color(31, 30, 31);
-    case BLACK:      return sf::Color::Black;
-    case RED:        return sf::Color::Red;
-    case GREEN:      return sf::Color::Green;
-    case BLUE:       return sf::Color::Blue;
-    case YELLOW:     return sf::Color::Yellow;
-    case ORANGE:     return sf::Color(255, 165, 0);
-    case PURPLE:     return sf::Color(138, 43, 226);
-    case MAGENTA:    return sf::Color::Magenta;
-    case CYAN:       return sf::Color::Cyan;
-    case RUBBY_PINK: return sf::Color(207, 142, 146);
-    case BROWN:      return sf::Color(165, 42, 42);
-    case LIME:       return sf::Color(50, 205, 50);
-    case LIGHT_BLUE: return sf::Color(173, 216, 230);
-    case YUKON_GOLD: return sf::Color(107, 106, 8);
-    case DARK_BLUE:  return sf::Color(0, 0, 139);
+    case GRAY:         return sf::Color(220,220,220);
+    case SOFT_BLACK:   return sf::Color(31, 30, 31);
+    case RED:          return sf::Color::Red;
+    case GREEN:        return sf::Color::Green;
+    case BLUE:         return sf::Color::Blue;
+    case YELLOW:       return sf::Color::Yellow;
+    case ORANGE:       return sf::Color(255, 165, 0);
+    case PURPLE:       return sf::Color(107, 6, 208);
+    case MAGENTA:      return sf::Color::Magenta;
+    case SCIENCE_BLUE: return sf::Color(0, 0, 139);
+    case YUKON_GOLD:   return sf::Color(107, 106, 8);
+    case LIGHT_BLUE:   return sf::Color(8, 105, 207);
+    case LIME:         return sf::Color(50, 205, 50);
+    case BROWN:        return sf::Color(165, 42, 42);
+    case RUBBY_PINK:   return sf::Color(207, 142, 146);
+    case CYAN:         return sf::Color::Cyan;
   }
 };
 
@@ -177,6 +177,8 @@ int main() {
   iterTitle.setString("Iter: ");
   iterTitle.setCharacterSize(20);
   iterTitle.setFillColor(sf::Color::White);
+  iterTitle.setOutlineColor(getColor(SOFT_BLACK));
+  iterTitle.setOutlineThickness(4.f);
   iterTitle.setPosition(sf::Vector2f(20.f, 20.f));
 
   sf::Text antStepsText;
@@ -184,6 +186,8 @@ int main() {
   antStepsText.setString("0");
   antStepsText.setCharacterSize(20);
   antStepsText.setFillColor(sf::Color::White);
+  antStepsText.setOutlineColor(getColor(SOFT_BLACK));
+  antStepsText.setOutlineThickness(4.f);
   antStepsText.setPosition(sf::Vector2f(90.f, 20.f));
 
   // run the program as long as the window is open
@@ -204,26 +208,17 @@ int main() {
     // draw everything here...
     for (size_t step = 0; step < stepsPerFrame; step++) {
 
-      // A rectangle with color to draw
-      sf::RectangleShape rect;
-      rect.setSize(sf::Vector2f(squareSize, squareSize));
-      rect.setPosition(ant.x, ant.y);
-      rect.setFillColor(getColor(grid[ant.x][ant.y]));
-
-      // Draw the rectangle on the render texture
-      renderTexture.draw(rect);
-
       switch (grid[ant.x][ant.y]) {
-        case SOFT_BLACK:
+        case GRAY:
           ant.turnRight();
-          grid[ant.x][ant.y] = BLACK;
+          grid[ant.x][ant.y] = RED;
           break;
-        case BLACK:
+        case SOFT_BLACK:
           ant.turnRight();
           grid[ant.x][ant.y] = RED;
           break;
         case RED:
-          ant.turnLeft();
+          ant.turnRight();
           grid[ant.x][ant.y] = GREEN;
           break;
         case GREEN:
@@ -235,11 +230,11 @@ int main() {
           grid[ant.x][ant.y] = YELLOW;
           break;
         case YELLOW:
-          ant.turnRight();
+          ant.turnLeft();
           grid[ant.x][ant.y] = ORANGE;
           break;
         case ORANGE:
-          ant.turnLeft();
+          ant.turnRight();
           grid[ant.x][ant.y] = PURPLE;
           break;
         case PURPLE:
@@ -248,45 +243,54 @@ int main() {
           break;
         case MAGENTA:
           ant.turnLeft();
-          grid[ant.x][ant.y] = DARK_BLUE;
+          grid[ant.x][ant.y] = CYAN;
           break;
-        case DARK_BLUE:
-          ant.turnLeft();
-          grid[ant.x][ant.y] = YUKON_GOLD;
-          break;
-        case YUKON_GOLD:
-          ant.turnLeft();
-          grid[ant.x][ant.y] = LIGHT_BLUE;
-          break;
-        case LIGHT_BLUE:
-          ant.turnLeft();
-          grid[ant.x][ant.y] = LIME;
-          break;
-        case LIME:
-          ant.turnLeft();
-          grid[ant.x][ant.y] = BROWN;
-          break;
-        case BROWN:
+        case CYAN:
           ant.turnLeft();
           grid[ant.x][ant.y] = RUBBY_PINK;
           break;
         case RUBBY_PINK:
           ant.turnLeft();
-          grid[ant.x][ant.y] = CYAN;
+          grid[ant.x][ant.y] = BROWN;
           break;
-        case CYAN:
-          ant.turnRight();
-          grid[ant.x][ant.y] = BLACK;
+        case BROWN:
+          ant.turnLeft();
+          grid[ant.x][ant.y] = LIME;
+          break;
+        case LIME:
+          ant.turnLeft();
+          grid[ant.x][ant.y] = LIGHT_BLUE;
+          break;
+        case LIGHT_BLUE:
+          ant.turnLeft();
+          grid[ant.x][ant.y] = YUKON_GOLD;
+          break;
+        case YUKON_GOLD:
+          ant.turnLeft();
+          grid[ant.x][ant.y] = SCIENCE_BLUE;
+          break;
+        case SCIENCE_BLUE:
+          ant.turnLeft();
+          grid[ant.x][ant.y] = GRAY;
           break;
       }
+
+      // A rectangle with color to draw
+      sf::RectangleShape rect;
+      rect.setSize(sf::Vector2f(squareSize, squareSize));
+      rect.setPosition(ant.x, ant.y);
+      rect.setFillColor(getColor(grid[ant.x][ant.y]));
+
+      // Draw the rectangle on the render texture
+      renderTexture.draw(rect);
       ant.moveForward();
       ant.steps++;
     }
 
     antStepsText.setString(formatWithDots(ant.steps));
+    window.draw(canvasSprite);
     window.draw(iterTitle);
     window.draw(antStepsText);
-    window.draw(canvasSprite);
 
     // end the current frame
     window.display();
